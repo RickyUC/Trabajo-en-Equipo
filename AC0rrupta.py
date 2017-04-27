@@ -13,8 +13,43 @@ class MetaPerson(type):
         return super().__new__(cls, name, bases, dic)
 
 class MetaRestaurant(type):
+    restaurants = []
     def __new__(meta, name, bases, dic):
+
         return super().__new__(meta, name, bases, dic)
+
+    def __call__(cls, name, chefs, clients):
+        nuevos_chefs = []
+        for chef in chefs:
+            #Revisa si el chef pertenece a otro restaurant
+            if chef.restaurant:
+                #Busca el restaurant en la lista de restaurants
+                pos = MetaRestaurant.restaurants.index(chef.restaurant)
+                restaurant = MetaRestaurant.restaurants[pos]
+                # Si el restaurant tiene más de un chef
+                if MetaRestaurant.se_puede_quitar(restaurant):
+                    MetaRestaurant.quitar_chef(restaurant, chef)
+                    nuevos_chefs.append(chef)
+                    chef.restaurant = name
+            else:
+                nuevos_chefs.append(chef)
+                chef.restaurant = name
+
+        instancia = super().__call__(name, nuevos_chefs, clients)
+        MetaRestaurant.restaurants.append(instancia)
+        return instancia
+
+
+    def se_puede_quitar(cls, restaurant):
+        if len(restaurant.chefs) > 1:
+            return True
+        return False
+
+    def quitar_chef(cls, restaurant, chef):
+        pos = restaurant.chefs.index(chef)
+        restaurant.chefs.pop(pos)
+
+
 
 
 ###############################################################################
