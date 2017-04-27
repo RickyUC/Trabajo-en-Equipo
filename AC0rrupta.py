@@ -76,19 +76,50 @@ def start(self):
 
 
 class MetaRestaurant(type):
+    restaurants = []
     def __new__(meta, name, bases, dic):
         dic["llega_cliente"] = llega_cliente
         dic["cliente_se_va"] = cliente_se_va
         dic["start"] = start
         return super().__new__(meta, name, bases, dic)
 
-    def __call__(meta, **args, **kwargs):
-        kw2 = dict(kwargs)
+    def __call__(cls, name, chefs, clients):
+        nuevos_chefs = []
+        for chef in chefs:
+            #Revisa si el chef pertenece a otro restaurant
+            if chef.restaurant:
+                #Busca el restaurant en la lista de restaurants
+                pos = MetaRestaurant.restaurants.index(chef.restaurant)
+                restaurant = MetaRestaurant.restaurants[pos]
+                # Si el restaurant tiene más de un chef
+                if MetaRestaurant.se_puede_quitar(restaurant):
+                    MetaRestaurant.quitar_chef(restaurant, chef)
+                    nuevos_chefs.append(chef)
+                    chef.restaurant = name
+            else:
+                nuevos_chefs.append(chef)
+                chef.restaurant = name
+
+        instancia = super().__call__(name, nuevos_chefs, clients)
+        MetaRestaurant.restaurants.append(instancia)
         print("Instanciación exitosa!")
         print("Los chefs contratados son los siguientes:\n")
-        for chef in kw2["chefs"]:
+        for chef in chefs:
             print("* {0}".format(chef))
-        return super().__call__(*args, **kwargs)
+        return instancia
+
+
+    def se_puede_quitar(cls, restaurant):
+        if len(restaurant.chefs) > 1:
+            return True
+        return False
+
+    def quitar_chef(cls, restaurant, chef):
+        pos = restaurant.chefs.index(chef)
+        restaurant.chefs.pop(pos)
+
+
+>>>>>>> c3e79637cb05c90ffa11eba81d748e935d5d902b
 
 
 ###############################################################################
