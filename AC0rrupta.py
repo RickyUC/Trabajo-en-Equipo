@@ -8,13 +8,87 @@ import random
 #será penalizada con nota 1.0
 
 
+def eat(self, plate):
+    food = isinstance(plate.food, Food)
+    drink = isinstance(plate.drink, Drink)
+    if food and drink:
+        if plate.food.quality + plate.drink.quality > 50:
+            print("Qué delicia!")
+        else:
+            print("Esto no es digno de mi paladar")
+    elif food and not drink:
+        print("Mi plato tiene dos comidas")
+    else:
+        print("Mi plato tiene dos bebidas")
+
+
+def cook(self):
+    plate = Plate()
+    self.choose_food(plate)
+    self.choose_drink(plate)
+    return plate
+
+
 class MetaPerson(type):
     def __new__(cls, name, bases, dic):
+        if name == "Chef":
+            dic['cook'] = cook
+        elif name == "Client":
+            dic["eat"] = eat
+        dic["restaurant"] = str()
+        if not isinstance(cls, Person):
+            print("La clase {0} no está heredando de Person!".format(name))
+            bases = (Person,)
+            print("La clase {0} está ahora heredando de Person".format(name))
         return super().__new__(cls, name, bases, dic)
+
+
+def llega_cliente(self, cliente):
+    if isinstance(cliente, Client):
+        self.clients.append(cliente)
+        print("El cliente llamado {0} se ha agregado a la lista del restaurant".format(cliente.name))
+    else:
+        print("El cliente a añadir no es una instancia válida de Client!")
+
+
+def cliente_se_va(self, client_name):
+    for client in self.clients:
+        name = client.name
+        if name == client_name:
+            self.clients.remove(client)
+            print("El cliente llamado {0} ha sido removido exitosamente!".format(client_name))
+
+
+def start(self):
+    if len(self.clients) != 0:
+        for i in range(1):  # Se hace el estudio por 5 dias
+            print("----- Día {} -----".format(i + 1))
+            plates = []
+            for chef in self.chefs:
+                for j in range(3):  # Cada chef cocina 3 platos
+                    plates.append(chef.cook())  # Retorna platos de comida y bebida
+
+            for client in self.clients:
+                for plate in plates:
+                    client.eat(plate)
+    else:
+        print("{0} no tiene clientes, que pena".format(self.name))
+
 
 class MetaRestaurant(type):
     def __new__(meta, name, bases, dic):
+        dic["llega_cliente"] = llega_cliente
+        dic["cliente_se_va"] = cliente_se_va
+        dic["start"] = start
         return super().__new__(meta, name, bases, dic)
+
+    def __call__(meta, **args, **kwargs):
+        kw2 = dict(kwargs)
+        print("Instanciación exitosa!")
+        print("Los chefs contratados son los siguientes:\n")
+        for chef in kw2["chefs"]:
+            print("* {0}".format(chef))
+        return super().__call__(*args, **kwargs)
 
 
 ###############################################################################
