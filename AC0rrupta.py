@@ -62,7 +62,7 @@ def cliente_se_va(self, client_name):
 def start(self):
     if len(self.clients) != 0:
         for i in range(1):  # Se hace el estudio por 5 dias
-            print("----- Día {} -----".format(i + 1))
+            print("\n----- Día {} -----".format(i + 1))
             plates = []
             for chef in self.chefs:
                 for j in range(3):  # Cada chef cocina 3 platos
@@ -72,7 +72,7 @@ def start(self):
                 for plate in plates:
                     client.eat(plate)
     else:
-        print("{0} no tiene clientes, que pena".format(self.name))
+        print("\n{0} no tiene clientes, que pena".format(self.name))
 
 
 class MetaRestaurant(type):
@@ -83,7 +83,9 @@ class MetaRestaurant(type):
         dic["start"] = start
         return super().__new__(meta, name, bases, dic)
 
-    def __call__(cls, name, chefs, clients):
+    def __call__(cls, name, chefs=None, clients=None):
+        chefs = chefs if chefs else []
+        clients = clients if clients else []
         nuevos_chefs = []
         for chef in chefs:
             #Revisa si el chef pertenece a otro restaurant
@@ -99,14 +101,14 @@ class MetaRestaurant(type):
             else:
                 nuevos_chefs.append(chef)
                 chef.restaurant = name
-
-        instancia = super().__call__(name, nuevos_chefs, clients)
-        MetaRestaurant.restaurants.append(instancia)
-        print("Instanciación exitosa!")
-        print("Los chefs contratados son los siguientes:\n")
-        for chef in chefs:
-            print("* {0}".format(chef))
-        return instancia
+        if nuevos_chefs:
+            instancia = super().__call__(name, nuevos_chefs, clients)
+            MetaRestaurant.restaurants.append(instancia)
+            print("\nInstanciación exitosa!")
+            print("Los chefs contratados son los siguientes:\n")
+            for chef in chefs:
+                print("* {0}".format(chef.name))
+            return instancia
 
 
     def se_puede_quitar(cls, restaurant):
@@ -117,9 +119,6 @@ class MetaRestaurant(type):
     def quitar_chef(cls, restaurant, chef):
         pos = restaurant.chefs.index(chef)
         restaurant.chefs.pop(pos)
-
-
->>>>>>> c3e79637cb05c90ffa11eba81d748e935d5d902b
 
 
 ###############################################################################
