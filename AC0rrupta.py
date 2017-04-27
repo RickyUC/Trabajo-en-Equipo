@@ -37,7 +37,7 @@ class MetaPerson(type):
             dic["eat"] = eat
         dic["restaurant"] = str()
         if not isinstance(cls, Person):
-            print("La clase {0} no está heredando de Person!".format(name))
+            print("\nLa clase {0} no está heredando de Person!".format(name))
             bases = (Person,)
             print("La clase {0} está ahora heredando de Person".format(name))
         return super().__new__(cls, name, bases, dic)
@@ -105,7 +105,7 @@ class MetaRestaurant(type):
             instancia = super().__call__(name, nuevos_chefs, clients)
             MetaRestaurant.restaurants.append(instancia)
             print("\nInstanciación exitosa!")
-            print("Los chefs contratados son los siguientes:\n")
+            print("Los chefs contratados por {0} son los siguientes:\n".format(name))
             for chef in chefs:
                 print("* {0}".format(chef.name))
             return instancia
